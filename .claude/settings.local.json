@@ -9,7 +9,11 @@
       "Bash(apt-get install:*)",
       "Bash(echo:*)",
       "mcp__github__create_branch",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(mkdir:*)",
+      "mcp__github__push_files"
     ],
     "deny": [],
     "ask": [],
