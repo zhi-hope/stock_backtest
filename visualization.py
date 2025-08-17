@@ -40,13 +40,14 @@ plt.rcParams['mathtext.bf'] = available_fonts[0] if available_fonts else 'sans-s
 plt.rcParams['mathtext.it'] = available_fonts[0] if available_fonts else 'sans-serif:italic'
 plt.rcParams['mathtext.cal'] = available_fonts[0] if available_fonts else 'sans-serif'
 
-def plot_investment_growth(backtest_result: Dict, symbol: str = "Stock"):
+def plot_investment_growth(backtest_result: Dict, symbol: str = "Stock", ax=None):
     """
     绘制定投增长图表
     
     Args:
         backtest_result: 回测结果
         symbol: 股票代码
+        ax: 可选的axes对象，如果提供则在该axes上绘制
     """
     if not backtest_result or 'investment_records' not in backtest_result:
         print("无效的回测结果")
@@ -54,8 +55,12 @@ def plot_investment_growth(backtest_result: Dict, symbol: str = "Stock"):
     
     records = backtest_result['investment_records']
     
-    # 创建图表
-    fig, ax1 = plt.subplots(figsize=(12, 8))
+    # 如果没有提供ax，则创建新的图表
+    if ax is None:
+        fig, ax1 = plt.subplots(figsize=(12, 8))
+    else:
+        ax1 = ax
+        fig = ax1.figure
     
     # 设置中文字体属性
     chinese_font = fm.FontProperties(family=plt.rcParams['font.sans-serif'][0] if plt.rcParams['font.sans-serif'] else None)
@@ -69,40 +74,52 @@ def plot_investment_growth(backtest_result: Dict, symbol: str = "Stock"):
     ax1.plot(records['Date'], investment_value, 
              label='投资价值', color='green', linewidth=2)
     
-    ax1.set_xlabel('日期', fontproperties=chinese_font)
-    ax1.set_ylabel('金额 ($)', color='blue', fontproperties=chinese_font)
-    ax1.tick_params(axis='y', labelcolor='blue')
-    
-    # 设置刻度标签字体
-    for label in ax1.get_xticklabels():
-        label.set_fontproperties(chinese_font)
-    for label in ax1.get_yticklabels():
-        label.set_fontproperties(chinese_font)
-    
-    # 格式化日期
-    ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
-    ax1.xaxis.set_major_locator(mdates.MonthLocator(interval=6))
-    plt.setp(ax1.xaxis.get_majorticklabels(), rotation=45, fontproperties=chinese_font)
-    
-    # 添加图例
-    legend = ax1.legend(loc='upper left')
-    for text in legend.get_texts():
-        text.set_fontproperties(chinese_font)
-    
-    # 添加标题和网格
-    plt.title(f'{symbol} 定投回测结果\n'
-              f'总投入: ${backtest_result["total_investment"]:.2f} | '
-              f'最终价值: ${backtest_result["final_value"]:.2f} | '
-              f'总收益率: {backtest_result["total_return"]:.2f}% | '
-              f'年化收益率: {backtest_result["annual_return"]:.2f}%', 
-              fontproperties=chinese_font)
-    
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
+    # 只在创建新图表时设置标签、标题等
+    if ax is None:
+        ax1.set_xlabel('日期', fontproperties=chinese_font)
+        ax1.set_ylabel('金额 ($)', color='blue', fontproperties=chinese_font)
+        ax1.tick_params(axis='y', labelcolor='blue')
+        
+        # 设置刻度标签字体
+        for label in ax1.get_xticklabels():
+            label.set_fontproperties(chinese_font)
+        for label in ax1.get_yticklabels():
+            label.set_fontproperties(chinese_font)
+        
+        # 格式化日期
+        ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
+        ax1.xaxis.set_major_locator(mdates.MonthLocator(interval=6))
+        plt.setp(ax1.xaxis.get_majorticklabels(), rotation=45, fontproperties=chinese_font)
+        
+        # 添加图例
+        legend = ax1.legend(loc='upper left')
+        for text in legend.get_texts():
+            text.set_fontproperties(chinese_font)
+        
+        # 添加标题和网格
+        plt.title(f'{symbol} 定投回测结果\n'
+                  f'总投入: ${backtest_result["total_investment"]:.2f} | '
+                  f'最终价值: ${backtest_result["final_value"]:.2f} | '
+                  f'总收益率: {backtest_result["total_return"]:.2f}% | '
+                  f'年化收益率: {backtest_result["annual_return"]:.2f}%', 
+                  fontproperties=chinese_font)
+        
+        plt.grid(True, alpha=0.3)
+        plt.tight_layout()
+    else:
+        # 在提供的axes上设置基本属性
+        ax1.set_xlabel('日期', fontproperties=chinese_font)
+        ax1.set_ylabel('金额 ($)', color='blue', fontproperties=chinese_font)
+        ax1.tick_params(axis='y', labelcolor='blue')
+        
+        # 添加图例
+        legend = ax1.legend(loc='upper left')
+        for text in legend.get_texts():
+            text.set_fontproperties(chinese_font)
     
     return fig
 
-def plot_price_vs_investment(stock_data: pd.DataFrame, backtest_result: Dict, symbol: str = "Stock"):
+def plot_price_vs_investment(stock_data: pd.DataFrame, backtest_result: Dict, symbol: str = "Stock", ax=None):
     """
     绘制股价与定投点对比图
     
@@ -110,6 +127,7 @@ def plot_price_vs_investment(stock_data: pd.DataFrame, backtest_result: Dict, sy
         stock_data: 股票数据
         backtest_result: 回测结果
         symbol: 股票代码
+        ax: 可选的axes对象，如果提供则在该axes上绘制
     """
     if not backtest_result or 'investment_records' not in backtest_result:
         print("无效的回测结果")
@@ -117,8 +135,12 @@ def plot_price_vs_investment(stock_data: pd.DataFrame, backtest_result: Dict, sy
     
     records = backtest_result['investment_records']
     
-    # 创建图表
-    fig, ax1 = plt.subplots(figsize=(12, 8))
+    # 如果没有提供ax，则创建新的图表
+    if ax is None:
+        fig, ax1 = plt.subplots(figsize=(12, 8))
+    else:
+        ax1 = ax
+        fig = ax1.figure
     
     # 设置中文字体属性
     chinese_font = fm.FontProperties(family=plt.rcParams['font.sans-serif'][0] if plt.rcParams['font.sans-serif'] else None)
@@ -131,30 +153,42 @@ def plot_price_vs_investment(stock_data: pd.DataFrame, backtest_result: Dict, sy
     ax1.scatter(records['Date'], records['Price'], 
                 color='red', s=50, label='定投点', zorder=5)
     
-    ax1.set_xlabel('日期', fontproperties=chinese_font)
-    ax1.set_ylabel('股价 ($)', color='blue', fontproperties=chinese_font)
-    ax1.tick_params(axis='y', labelcolor='blue')
-    
-    # 设置刻度标签字体
-    for label in ax1.get_xticklabels():
-        label.set_fontproperties(chinese_font)
-    for label in ax1.get_yticklabels():
-        label.set_fontproperties(chinese_font)
-    
-    # 格式化日期
-    ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
-    ax1.xaxis.set_major_locator(mdates.MonthLocator(interval=6))
-    plt.setp(ax1.xaxis.get_majorticklabels(), rotation=45, fontproperties=chinese_font)
-    
-    # 添加图例
-    legend = ax1.legend(loc='upper left')
-    for text in legend.get_texts():
-        text.set_fontproperties(chinese_font)
-    
-    # 添加标题和网格
-    plt.title(f'{symbol} 股价与定投点对比', 
-              fontproperties=chinese_font)
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
+    # 只在创建新图表时设置标签、标题等
+    if ax is None:
+        ax1.set_xlabel('日期', fontproperties=chinese_font)
+        ax1.set_ylabel('股价 ($)', color='blue', fontproperties=chinese_font)
+        ax1.tick_params(axis='y', labelcolor='blue')
+        
+        # 设置刻度标签字体
+        for label in ax1.get_xticklabels():
+            label.set_fontproperties(chinese_font)
+        for label in ax1.get_yticklabels():
+            label.set_fontproperties(chinese_font)
+        
+        # 格式化日期
+        ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
+        ax1.xaxis.set_major_locator(mdates.MonthLocator(interval=6))
+        plt.setp(ax1.xaxis.get_majorticklabels(), rotation=45, fontproperties=chinese_font)
+        
+        # 添加图例
+        legend = ax1.legend(loc='upper left')
+        for text in legend.get_texts():
+            text.set_fontproperties(chinese_font)
+        
+        # 添加标题和网格
+        plt.title(f'{symbol} 股价与定投点对比', 
+                  fontproperties=chinese_font)
+        plt.grid(True, alpha=0.3)
+        plt.tight_layout()
+    else:
+        # 在提供的axes上设置基本属性
+        ax1.set_xlabel('日期', fontproperties=chinese_font)
+        ax1.set_ylabel('股价 ($)', color='blue', fontproperties=chinese_font)
+        ax1.tick_params(axis='y', labelcolor='blue')
+        
+        # 添加图例
+        legend = ax1.legend(loc='upper left')
+        for text in legend.get_texts():
+            text.set_fontproperties(chinese_font)
     
     return fig
