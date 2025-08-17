@@ -1,9 +1,20 @@
 {
   "permissions": {
     "allow": [
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "WebSearch",
+      "Bash(pip install:*)",
+      "Bash(apt list:*)",
+      "Bash(apt-get update:*)",
+      "Bash(apt-get install:*)",
+      "Bash(echo:*)",
+      "mcp__github__create_branch",
+      "Bash(git add:*)"
     ],
     "deny": [],
-    "ask": []
+    "ask": [],
+    "additionalDirectories": [
+      "/tmp/.X11-unix"
+    ]
   }
 }
