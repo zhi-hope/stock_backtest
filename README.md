@@ -5,12 +5,13 @@
 ## 功能特点
 
 - 获取美股历史股价数据 (使用yfinance库)
-- 模拟每周或每月定投策略
+- 模拟每周或每月定投策略 (可自定义日期)
 - 计算定投收益率和年化收益率
 - 与一次性投资策略进行比较
 - 可视化定投结果和股价走势
 - 支持命令行交互式使用和编程方式调用
 - 提供图形用户界面(GUI)进行可视化操作
+- 包含自动化测试套件 (pytest)
 
 ## 安装依赖
 
@@ -24,6 +25,15 @@ pip install -r requirements.txt
 - yfinance
 - matplotlib
 - PyQt6
+- pytest
+
+## 运行测试
+
+项目包含一套自动化测试，用于验证核心计算逻辑的准确性。安装依赖后，运行以下命令：
+
+```bash
+python3 -m pytest
+```
 
 ## 使用方式
 
@@ -95,7 +105,7 @@ if backtester.load_data(symbol, start_date, end_date):
 
 ### StockDripBacktester (main.py)
 - `load_data(symbol, start_date, end_date)` - 加载股票数据
-- `run_backtest(amount, start_date, end_date, compare, strategy)` - 运行定投回测
+- `run_backtest(amount, start_date, end_date, compare, strategy, strategy_params)` - 运行定投回测
 - `print_results(result, compare, strategy)` - 打印回测结果
 - `plot_results(result)` - 生成和保存图表
 
@@ -104,13 +114,13 @@ if backtester.load_data(symbol, start_date, end_date):
 - `get_stock_info(symbol)` - 获取股票信息
 
 ### 投资策略 (investment_strategy.py)
-- `weekly_investment_dates(start_date, end_date)` - 生成每周投资日期
-- `monthly_investment_dates(start_date, end_date)` - 生成每月投资日期
+- `weekly_investment_dates(start_date, end_date, day_of_week)` - 生成每周投资日期
+- `monthly_investment_dates(start_date, end_date, day_of_month)` - 生成每月投资日期
 - `calculate_investment_shares(stock_data, investment_dates, weekly_amount)` - 计算每次投资的股份数量
 
 ### 回测 (backtest.py)
-- `run_backtest(stock_data, amount, start_date, end_date, strategy)` - 执行定投回测
-- `compare_with_lump_sum(stock_data, amount, start_date, end_date, strategy)` - 与一次性投资比较
+- `run_backtest(stock_data, amount, start_date, end_date, strategy, strategy_params)` - 执行定投回测
+- `compare_with_lump_sum(stock_data, amount, start_date, end_date, strategy, strategy_params)` - 与一次性投资比较
 
 ### 可视化 (visualization.py)
 - `plot_investment_growth(backtest_result, symbol, ax=None)` - 绘制定投增长图表

@@ -82,7 +82,7 @@ class StockDripBacktester:
         return True
     
     def run_backtest(self, amount: float, start_date: str, end_date: str, 
-                    compare: bool = False, strategy: str = 'weekly') -> Optional[Dict]:
+                    compare: bool = False, strategy: str = 'weekly', strategy_params: Optional[Dict] = None) -> Optional[Dict]:
         """
         运行定投回测
         
@@ -92,7 +92,8 @@ class StockDripBacktester:
             end_date: 回测结束日期
             compare: 是否与一次性投资比较
             strategy: 定投策略 ('weekly' 或 'monthly')
-            
+            strategy_params: 策略参数 (例如 {'day_of_week': 0})
+
         Returns:
             回测结果
         """
@@ -105,9 +106,9 @@ class StockDripBacktester:
         print(f"使用实际数据起始日期 {actual_start_date} 进行回测")
         
         if compare:
-            result = compare_with_lump_sum(self.stock_data, amount, actual_start_date, end_date, strategy)
+            result = compare_with_lump_sum(self.stock_data, amount, actual_start_date, end_date, strategy, strategy_params)
         else:
-            result = run_backtest(self.stock_data, amount, actual_start_date, end_date, strategy)
+            result = run_backtest(self.stock_data, amount, actual_start_date, end_date, strategy, strategy_params)
             
         return result
     
@@ -231,7 +232,34 @@ def main():
     print("2. 每月定投")
     strategy_choice = input("请输入选择 (1 或 2, 默认为 1): ").strip()
     strategy = 'monthly' if strategy_choice == '2' else 'weekly'
-    
+    strategy_params = {}
+
+    # 获取策略参数
+    if strategy == 'weekly':
+        day_map = {"0": "周一", "1": "周二", "2": "周三", "3": "周四", "4": "周五", "5": "周六", "6": "周日"}
+        day_of_week_input = input("请输入每周定投的日期 (0-6, 0是周一, 默认为0): ").strip()
+        try:
+            day_of_week = int(day_of_week_input) if day_of_week_input else 0
+            if 0 <= day_of_week <= 6:
+                strategy_params['day_of_week'] = day_of_week
+                print(f"已选择每周的 {day_map[str(day_of_week)]} 进行定投ảng。")
+            else:
+                print("输入无效，使用默认的周一进行定投。")
+        except ValueError:
+            print("输入无效，使用默认的周一进行定投。")
+
+    elif strategy == 'monthly':
+        day_of_month_input = input("请输入每月定投的日期 (1-31, 默认为1): ").strip()
+        try:
+            day_of_month = int(day_of_month_input) if day_of_month_input else 1
+            if 1 <= day_of_month <= 31:
+                strategy_params['day_of_month'] = day_of_month
+                print(f"已选择每月的 {day_of_month} 号进行定投。")
+            else:
+                print("输入无效，使用默认的1号进行定投。")
+        except ValueError:
+            print("输入无效，使用默认的1号进行定投。")
+
     # 获取定投金额
     amount_prompt = "请输入每月定投金额 (美元)" if strategy == 'monthly' else "请输入每周定投金额 (美元)"
     amount_input = input(f"{amount_prompt} (默认为 100.0): ").strip()
@@ -251,7 +279,8 @@ def main():
             start_date=start_date,
             end_date=end_date,
             compare=True,  # 与一次性投资比较
-            strategy=strategy
+            strategy=strategy,
+            strategy_params=strategy_params
         )
         
         # 打印结果
@@ -297,7 +326,8 @@ def main():
             start_date=start_date,
             end_date=end_date,
             compare=True,  # 与一次性投资比较
-            strategy=strategy
+            strategy=strategy,
+            strategy_params=strategy_params
         )
         
         # 打印结果
@@ -305,6 +335,7 @@ def main():
         
         # 绘制结果图表
         backtester.plot_results(backtest_result['drip_result'] if 'drip_result' in backtest_result else backtest_result)
+
 
 if __name__ == "__main__":
     main()

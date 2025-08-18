@@ -3,3 +3,4 @@ pandas
 yfinance
 matplotlib
 PyQt6
+pytest

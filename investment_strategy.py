@@ -6,13 +6,14 @@ from typing import Dict, List
 from datetime import datetime, timedelta
 import pytz
 
-def weekly_investment_dates(start_date: str, end_date: str) -> List[datetime]:
+def weekly_investment_dates(start_date: str, end_date: str, day_of_week: int = 0) -> List[datetime]:
     """
     生成每周定投日期列表
     
     Args:
         start_date: 开始日期 (YYYY-MM-DD)
         end_date: 结束日期 (YYYY-MM-DD)
+        day_of_week: 周几定投 (0=周一, 1=周二, ..., 6=周日)
         
     Returns:
         定投日期列表
@@ -20,28 +21,29 @@ def weekly_investment_dates(start_date: str, end_date: str) -> List[datetime]:
     start = datetime.strptime(start_date, '%Y-%m-%d')
     end = datetime.strptime(end_date, '%Y-%m-%d')
     
-    # 调整到最近的周一
-    days_ahead = 0 - start.weekday()  # Monday is 0
-    if days_ahead <= 0:  # Target day already happened this week
+    # 调整到第一个定投日
+    days_ahead = day_of_week - start.weekday()
+    if days_ahead < 0:  # Target day already happened this week
         days_ahead += 7
-    first_monday = start + timedelta(days_ahead)
+    first_investment_date = start + timedelta(days=days_ahead)
     
-    # 生成每周一的日期
+    # 生成每周指定日的日期
     dates = []
-    current = first_monday
+    current = first_investment_date
     while current <= end:
         dates.append(current)
         current += timedelta(weeks=1)
     
     return dates
 
-def monthly_investment_dates(start_date: str, end_date: str) -> List[datetime]:
+def monthly_investment_dates(start_date: str, end_date: str, day_of_month: int = 1) -> List[datetime]:
     """
-    生成每月定投日期列表（每月第一个交易日）
+    生成每月定投日期列表
     
     Args:
         start_date: 开始日期 (YYYY-MM-DD)
         end_date: 结束日期 (YYYY-MM-DD)
+        day_of_month: 每月几号定投 (1-31)
         
     Returns:
         定投日期列表
@@ -50,30 +52,33 @@ def monthly_investment_dates(start_date: str, end_date: str) -> List[datetime]:
     end = datetime.strptime(end_date, '%Y-%m-%d')
     
     dates = []
-    current_year = start.year
-    current_month = start.month
-    
+    # 从开始日期的年份和月份开始
+    year = start.year
+    month = start.month
+
     while True:
-        # 生成每月第一天
+        # 构造当前循环月份的定投日期
+        current_date_to_try = datetime(year, month, 1)
+        if current_date_to_try > end:
+            break
+
         try:
-            first_day = datetime(current_year, current_month, 1)
+            # 尝试创建指定日的日期
+            invest_date = datetime(year, month, day_of_month)
+            # 只有当定投日在回测范围内时才添加
+            if start <= invest_date <= end:
+                dates.append(invest_date)
         except ValueError:
-            # 处理月份溢出情况
-            break
+            # 如果日期无效 (例如2月31日)，则静默跳过这个月
+            pass
+
+        # 移至下一个月
+        if month == 12:
+            month = 1
+            year += 1
+        else:
+            month += 1
             
-        # 如果超过结束日期则退出
-        if first_day > end:
-            break
-            
-        # 添加到日期列表
-        dates.append(first_day)
-        
-        # 移动到下一个月
-        current_month += 1
-        if current_month > 12:
-            current_month = 1
-            current_year += 1
-    
     return dates
 
 def calculate_investment_shares(stock_data: pd.DataFrame, investment_dates: List[datetime], 
