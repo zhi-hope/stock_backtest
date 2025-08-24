@@ -1,17 +1,9 @@
-"""
-Test for backtest.py
-"""
 import pytest
 import pandas as pd
 import numpy as np
-import sys
-import os
 from datetime import datetime
 
-# Add project root to path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-from backtest import run_backtest, _get_price_on_or_near
+from src.backtest import run_backtest, _get_price_on_or_near
 
 @pytest.fixture
 def sample_stock_data():

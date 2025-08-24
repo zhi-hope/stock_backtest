@@ -1,15 +1,7 @@
-"""
-Test for investment_strategy.py
-"""
 import pytest
 from datetime import datetime
-import sys
-import os
 
-# Add project root to path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-from investment_strategy import weekly_investment_dates, monthly_investment_dates
+from src.investment_strategy import weekly_investment_dates, monthly_investment_dates
 
 def test_weekly_investment_dates():
     # Test case 1: Default (Monday)
