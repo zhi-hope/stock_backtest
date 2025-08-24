@@ -214,9 +214,8 @@ def main():
     
     # 获取用户输入
     print("=== 美股股票定投回测器 ===")
-    symbol = input("请输入股票代码 (例如: AAPL): ").strip().upper()
-    if not symbol:
-        symbol = "AAPL"  # 默认使用苹果公司
+    symbol_input = input("请输入股票代码，多个股票请用逗号分隔 (例如: AAPL,GOOGL,MSFT): ").strip().upper()
+    symbols = [s.strip() for s in symbol_input.split(',')] if symbol_input else ["AAPL"]
     
     start_date = input("请输入开始日期 (YYYY-MM-DD, 例如: 2020-01-01): ").strip()
     if not start_date:
@@ -242,7 +241,7 @@ def main():
             day_of_week = int(day_of_week_input) if day_of_week_input else 0
             if 0 <= day_of_week <= 6:
                 strategy_params['day_of_week'] = day_of_week
-                print(f"已选择每周的 {day_map[str(day_of_week)]} 进行定投ảng。")
+                print(f"已选择每周的 {day_map[str(day_of_week)]} 进行定投。")
             else:
                 print("输入无效，使用默认的周一进行定投。")
         except ValueError:

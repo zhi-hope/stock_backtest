@@ -66,3 +66,35 @@ def get_multiple_stocks_data(symbols: List[str], start_date: str, end_date: str)
         if data is not None:
             data_dict[symbol] = data
     return data_dict
+
+def get_multiple_stocks_data_parallel(symbols: List[str], start_date: str, end_date: str) -> Dict:
+    """
+    并行获取多个股票的数据
+    
+    Args:
+        symbols: 股票代码列表
+        start_date: 开始日期
+        end_date: 结束日期
+        
+    Returns:
+        股票数据字典
+    """
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    import threading
+    
+    data_dict = {}
+    lock = threading.Lock()
+    
+    def fetch_single_stock(symbol):
+        data = get_stock_data(symbol, start_date, end_date)
+        if data is not None:
+            with lock:
+                data_dict[symbol] = data
+    
+    # 使用线程池并行获取数据
+    with ThreadPoolExecutor(max_workers=min(len(symbols), 10)) as executor:
+        futures = [executor.submit(fetch_single_stock, symbol) for symbol in symbols]
+        for future in as_completed(futures):
+            future.result()  # 等待任务完成
+    
+    return data_dict
