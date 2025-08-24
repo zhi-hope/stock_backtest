@@ -1,6 +1,3 @@
-"""
-Test for investment_strategy.py
-"""
 import pytest
 from datetime import datetime
 

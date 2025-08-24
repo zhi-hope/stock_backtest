@@ -7,11 +7,13 @@ from datetime import datetime
 # 在导入PyQt6之前设置环境变量以避免X11连接问题
 os.environ['QT_QPA_PLATFORM'] = 'offscreen'
 
-from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
-                            QHBoxLayout, QLabel, QLineEdit, QPushButton, 
-                            QRadioButton, QButtonGroup, QCheckBox, QTextEdit, 
-                            QTabWidget, QFileDialog, QMessageBox, QDateEdit, 
-                            QGroupBox, QFormLayout)
+from PyQt6.QtWidgets import (
+    QApplication, QMainWindow, QWidget, QVBoxLayout, 
+    QHBoxLayout, QLabel, QLineEdit, QPushButton, 
+    QRadioButton, QButtonGroup, QCheckBox, QTextEdit, 
+    QTabWidget, QFileDialog, QMessageBox, QDateEdit, 
+    QGroupBox, QFormLayout
+)
 from PyQt6.QtCore import QDate, Qt
 from PyQt6.QtGui import QFont, QIcon
 import matplotlib.pyplot as plt
